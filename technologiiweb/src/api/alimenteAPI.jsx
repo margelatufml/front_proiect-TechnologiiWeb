@@ -53,6 +53,46 @@ const AlimentAPI = {
       throw error;
     }
   },
+  getAlerts: async (userId) => {
+    try {
+      const response = await axios.get(`${apiUrl}/alerts/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching alerts:", error);
+      throw error;
+    }
+  },
+
+  markAsAvailable: async (id) => {
+    try {
+      const response = await axios.put(`${apiUrl}/${id}/toggle`);
+      return response.data;
+    } catch (error) {
+      console.error("Error marking product as available:", error);
+      throw error;
+    }
+  },
+
+  claimProduct: async (id, id_utilizator) => {
+    try {
+      const response = await axios.put(`${apiUrl}/${id}`, { id_utilizator });
+      return response.data;
+    } catch (error) {
+      console.error("Error claiming product:", error);
+      throw error;
+    }
+  },
+
+  // Fetch all available products
+  getAvailableProducts: async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/disponibil`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching available products:", error);
+      throw error;
+    }
+  },
 };
 
 export default AlimentAPI;
