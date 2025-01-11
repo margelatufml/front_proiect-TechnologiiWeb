@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import FridgeList from "../components/FridgeList";
 import AddAliment from "../components/AddAliment";
 import CategoryFilter from "../components/CategoryFilter";
+import AlertsList from "../components/Alertsist";
 import AlimentAPI from "../api/alimenteAPI";
 
 const FridgePage = ({ userId }) => {
@@ -41,6 +42,7 @@ const FridgePage = ({ userId }) => {
       <h1>My Fridge</h1>
       <AddAliment userId={userId} onAdd={handleAddAliment} />
       <CategoryFilter onFilter={handleFilterCategory} />
+      <AlertsList userId={userId} />
       <FridgeList alimente={filteredAlimente} />
     </div>
   );
