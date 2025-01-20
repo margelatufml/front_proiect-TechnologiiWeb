@@ -18,11 +18,14 @@ const AlimenteList = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Alimente List</h1>
-      <ul>
+    <div className="p-6 bg-base-200 rounded-lg shadow-lg">
+      <h1 className="text-2xl font-bold">Alimente List</h1>
+
+      <ul className="list-disc list-inside">
         {alimente.map((aliment) => (
-          <li key={aliment.id_aliment}>{aliment.continut}</li>
+          <li key={aliment.id_aliment} className="p-2">
+            {aliment.continut}
+          </li>
         ))}
       </ul>
     </div>

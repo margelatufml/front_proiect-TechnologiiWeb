@@ -29,7 +29,7 @@ const UtilizatorAPI = {
       const response = await axios.get(`${config.apibackend}/utilizatori`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching users:", error.response?.data || error);
       throw error;
     }
   },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PrietenAPI from "../api/prietenAPI";
+import PrietenAPI from "../api/PrietenAPI";
 
 const FriendGroups = ({ userId }) => {
   const [friends, setFriends] = useState([]);
@@ -9,7 +9,6 @@ const FriendGroups = ({ userId }) => {
   });
   const [error, setError] = useState("");
 
-  // Fetch all friends for the user
   useEffect(() => {
     const fetchFriends = async () => {
       try {
@@ -24,7 +23,6 @@ const FriendGroups = ({ userId }) => {
     fetchFriends();
   }, [userId]);
 
-  // Add a new friend
   const handleAddFriend = async (e) => {
     e.preventDefault();
     try {
@@ -40,20 +38,16 @@ const FriendGroups = ({ userId }) => {
     }
   };
 
-  // Update a friend's label
-  const handleUpdateFriend = async (
-    id_prieten_utilizator,
-    eticheta_prieten
-  ) => {
+  const handleUpdateFriend = async (id, label) => {
     try {
       await PrietenAPI.updateFriendLabel(userId, {
-        id_prieten_utilizator,
-        eticheta_prieten,
+        id_prieten_utilizator: id,
+        eticheta_prieten: label,
       });
       setFriends((prev) =>
         prev.map((friend) =>
-          friend.id_prieten_utilizator === id_prieten_utilizator
-            ? { ...friend, eticheta_prieten }
+          friend.id_prieten_utilizator === id
+            ? { ...friend, eticheta_prieten: label }
             : friend
         )
       );
@@ -62,61 +56,80 @@ const FriendGroups = ({ userId }) => {
     }
   };
 
-  // Delete a friend
-  const handleDeleteFriend = async (id_prietenie) => {
+  const handleDeleteFriend = async (id) => {
     try {
-      await PrietenAPI.deleteFriend(id_prietenie);
-      setFriends((prev) =>
-        prev.filter((friend) => friend.id_prietenie !== id_prietenie)
-      );
+      await PrietenAPI.deleteFriend(id);
+      setFriends((prev) => prev.filter((friend) => friend.id_prietenie !== id));
     } catch (err) {
       console.error("Error deleting friend:", err);
     }
   };
 
   return (
-    <div>
-      <h2>Manage Friends</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleAddFriend}>
-        <input
-          type="number"
-          placeholder="Friend's User ID"
-          value={newFriend.id_prieten_utilizator}
-          onChange={(e) =>
-            setNewFriend({
-              ...newFriend,
-              id_prieten_utilizator: e.target.value,
-            })
-          }
-          required
-        />
-        <input
-          type="text"
-          placeholder="Tag (e.g., Vegetarian)"
-          value={newFriend.eticheta_prieten}
-          onChange={(e) =>
-            setNewFriend({ ...newFriend, eticheta_prieten: e.target.value })
-          }
-          required
-        />
-        <button type="submit">Add Friend</button>
+    <div className="p-4 bg-base-200 rounded-lg shadow-lg">
+      <h2 className="text-xl font-bold">Manage Friends</h2>
+      {error && <p className="text-error">{error}</p>}
+      <form onSubmit={handleAddFriend} className="space-y-4 mt-4">
+        <div className="form-control">
+          <input
+            type="number"
+            placeholder="Friend's User ID"
+            value={newFriend.id_prieten_utilizator}
+            onChange={(e) =>
+              setNewFriend({
+                ...newFriend,
+                id_prieten_utilizator: e.target.value,
+              })
+            }
+            className="input input-bordered"
+            required
+          />
+        </div>
+        <div className="form-control">
+          <input
+            type="text"
+            placeholder="Tag (e.g., Vegetarian)"
+            value={newFriend.eticheta_prieten}
+            onChange={(e) =>
+              setNewFriend({ ...newFriend, eticheta_prieten: e.target.value })
+            }
+            className="input input-bordered"
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Add Friend
+        </button>
       </form>
-      <ul>
+      <ul className="space-y-4 mt-4">
         {friends.map((friend) => (
-          <li key={friend.id_prietenie}>
-            Friend ID: {friend.id_prieten_utilizator} - Tag:{" "}
-            {friend.eticheta_prieten}
-            <input
-              type="text"
-              value={friend.eticheta_prieten}
-              onChange={(e) =>
-                handleUpdateFriend(friend.id_prieten_utilizator, e.target.value)
-              }
-            />
-            <button onClick={() => handleDeleteFriend(friend.id_prietenie)}>
-              Delete
-            </button>
+          <li
+            key={friend.id_prietenie}
+            className="p-4 bg-base-100 rounded-lg shadow-md flex justify-between items-center"
+          >
+            <span>
+              Friend ID: {friend.id_prieten_utilizator} - Tag:{" "}
+              {friend.eticheta_prieten}
+            </span>
+            <div className="space-x-2">
+              <input
+                type="text"
+                value={friend.eticheta_prieten}
+                onChange={(e) =>
+                  handleUpdateFriend(
+                    friend.id_prieten_utilizator,
+                    e.target.value
+                  )
+                }
+                className="input input-bordered w-48"
+              />
+              <button
+                onClick={() => handleDeleteFriend(friend.id_prietenie)}
+                className="btn btn-outline btn-error"
+              >
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
