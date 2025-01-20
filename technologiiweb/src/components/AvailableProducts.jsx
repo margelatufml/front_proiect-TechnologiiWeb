@@ -21,12 +21,17 @@ const AvailableProducts = () => {
   }, []);
 
   return (
-    <div>
-      <h2>Available Products</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <ul>
+    <div className="p-6 bg-base-200 rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold">Available Products</h2>
+
+      {error && <p className="text-error">{error}</p>}
+
+      <ul className="space-y-4">
         {products.map((product) => (
-          <li key={product.id_aliment}>
+          <li
+            key={product.id_aliment}
+            className="p-4 bg-base-100 rounded-lg shadow-md"
+          >
             <PostToSocialMedia product={product} />
           </li>
         ))}

@@ -4,10 +4,17 @@ import AddAliment from "../components/AddAliment";
 import CategoryFilter from "../components/CategoryFilter";
 import AlertsList from "../components/Alertsist";
 import AlimentAPI from "../api/alimenteAPI";
+import NavBar from "../components/Navbar";
+import FriendGroups from "../components/FriendGroups";
+import InviteFriends from "../components/InviteFriends";
+import SearchAllUsers from "../components/SearchAllUsers";
+import AddFriend from "../components/AddFriend";
+import FoodItemsModal from "../components/FoodItemsModal";
 
 const FridgePage = ({ userId }) => {
   const [alimente, setAlimente] = useState([]);
   const [filteredAlimente, setFilteredAlimente] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAlimente = async () => {
@@ -37,13 +44,35 @@ const FridgePage = ({ userId }) => {
     }
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div>
-      <h1>My Fridge</h1>
+      <NavBar />
       <AddAliment userId={userId} onAdd={handleAddAliment} />
       <CategoryFilter onFilter={handleFilterCategory} />
       <AlertsList userId={userId} />
       <FridgeList alimente={filteredAlimente} />
+      <FriendGroups userId={userId} />
+      <InviteFriends userId={userId} />
+      <SearchAllUsers />
+      <AddFriend userId={userId} />
+      {isModalOpen && (
+        <FoodItemsModal
+          userId={userId}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
+      )}{" "}
+      <button className="btn btn-primary" onClick={openModal}>
+        View All Food Items
+      </button>
     </div>
   );
 };

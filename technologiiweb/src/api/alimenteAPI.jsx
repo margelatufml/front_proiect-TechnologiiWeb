@@ -9,7 +9,7 @@ const AlimentAPI = {
       const response = await axios.post(apiUrl, data);
       return response.data;
     } catch (error) {
-      console.error("Error creating aliment:", error);
+      console.error("Error creating aliment:", error.response?.data || error);
       throw error;
     }
   },
@@ -24,9 +24,10 @@ const AlimentAPI = {
     }
   },
 
-  getAlimenteByUser: async (id_utilizator) => {
+  // Fetch alimente by user
+  getAlimenteByUser: async (userId) => {
     try {
-      const response = await axios.get(`${apiUrl}/${id_utilizator}`);
+      const response = await axios.get(`${apiUrl}/${userId}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching alimente by user:", error);
@@ -34,31 +35,26 @@ const AlimentAPI = {
     }
   },
 
-  toggleDisponibil: async (id) => {
+  // Fetch alimente by category
+  getAlimenteByCategory: async (userId, category) => {
     try {
-      const response = await axios.put(`${apiUrl}/${id}/toggle`);
+      const response = await axios.get(`${apiUrl}/${userId}/${category}`);
       return response.data;
     } catch (error) {
-      console.error("Error toggling disponibil:", error);
+      console.error(
+        "Error fetching alimente by category:",
+        error.response?.data || error
+      );
       throw error;
     }
   },
 
-  deleteAliment: async (id) => {
-    try {
-      const response = await axios.delete(`${apiUrl}/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting aliment:", error);
-      throw error;
-    }
-  },
   getAlerts: async (userId) => {
     try {
-      const response = await axios.get(`${apiUrl}/alerts/${userId}`);
+      const response = await axios.get(`${config.apibackend}/alerts/${userId}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching alerts:", error);
+      console.error("Error fetching alerts:", error.response?.data || error);
       throw error;
     }
   },
@@ -68,28 +64,22 @@ const AlimentAPI = {
       const response = await axios.put(`${apiUrl}/${id}/toggle`);
       return response.data;
     } catch (error) {
-      console.error("Error marking product as available:", error);
+      console.error(
+        "Error marking as available:",
+        error.response?.data || error
+      );
       throw error;
     }
   },
 
-  claimProduct: async (id, id_utilizator) => {
+  claimAliment: async (id, userId) => {
     try {
-      const response = await axios.put(`${apiUrl}/${id}`, { id_utilizator });
+      const response = await axios.put(`${apiUrl}/${id}`, {
+        id_utilizator: userId,
+      });
       return response.data;
     } catch (error) {
-      console.error("Error claiming product:", error);
-      throw error;
-    }
-  },
-
-  // Fetch all available products
-  getAvailableProducts: async () => {
-    try {
-      const response = await axios.get(`${apiUrl}/disponibil`);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching available products:", error);
+      console.error("Error claiming aliment:", error);
       throw error;
     }
   },
