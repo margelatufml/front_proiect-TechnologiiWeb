@@ -4,6 +4,7 @@ import PrietenAPI from "../api/PrietenAPI";
 import UtilizatorAPI from "../api/utilizatorAPI";
 import FoodItemsModal from "./FoodItemsModal";
 
+
 const FriendGroups = ({ userId }) => {
   const [friends, setFriends] = useState([]);
   const [userNames, setUserNames] = useState({});
