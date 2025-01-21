@@ -1,32 +1,46 @@
+// src/components/FriendGroups.jsx
 import React, { useState, useEffect } from "react";
 import PrietenAPI from "../api/PrietenAPI";
+import UtilizatorAPI from "../api/utilizatorAPI";
 import FoodItemsModal from "./FoodItemsModal";
 
 const FriendGroups = ({ userId }) => {
   const [friends, setFriends] = useState([]);
+  const [userNames, setUserNames] = useState({});
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFriendId, setSelectedFriendId] = useState(null);
 
   useEffect(() => {
-    const fetchFriends = async () => {
+    const fetchFriendsAndUsers = async () => {
       try {
-        const data = await PrietenAPI.getFriendsByUser(userId);
-        setFriends(data);
+        // Fetch friends
+        const friendsData = await PrietenAPI.getFriendsByUser(userId);
+        setFriends(friendsData);
+
+        // Fetch all users
+        const usersData = await UtilizatorAPI.getAllUsers();
+
+        // Create a mapping from user ID to user name
+        const namesMap = {};
+        usersData.forEach((user) => {
+          namesMap[user.id_utilizator] = user.username;
+        });
+        setUserNames(namesMap);
       } catch (err) {
-        console.error("Error fetching friends:", err);
+        console.error("Error fetching friends or users:", err);
         setError("Failed to load friends.");
       }
     };
 
-    fetchFriends();
+    fetchFriendsAndUsers();
+
     const handleFriendAdded = () => {
-      fetchFriends();
+      fetchFriendsAndUsers();
     };
     window.addEventListener("friendAdded", handleFriendAdded);
 
     return () => {
-      // Cleanup the event listener
       window.removeEventListener("friendAdded", handleFriendAdded);
     };
   }, [userId]);
@@ -56,7 +70,7 @@ const FriendGroups = ({ userId }) => {
   const handleUpdateTag = async (friendId, newTag) => {
     try {
       await PrietenAPI.updateFriendLabel(userId, {
-        id_prieten_utilizator: friendId,
+        id_utilizator: friendId,
         eticheta_prieten: newTag,
       });
       setFriends((prevFriends) =>
@@ -83,7 +97,10 @@ const FriendGroups = ({ userId }) => {
             className="p-4 bg-base-100 rounded-lg shadow-md flex justify-between items-center"
           >
             <span>
-              Friend ID: {friend.id_prieten_utilizator} - Tag:{" "}
+              <strong>
+                {userNames[friend.id_prieten_utilizator] || "Unknown User"}
+              </strong>{" "}
+              - Tag:{" "}
               <input
                 type="text"
                 value={friend.eticheta_prieten}

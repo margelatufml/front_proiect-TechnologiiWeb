@@ -1,20 +1,16 @@
+// src/pages/FridgePage.jsx
 import React, { useState, useEffect } from "react";
 import AlimentAPI from "../api/alimenteAPI";
 import NavBar from "../components/Navbar";
 import FridgeWithAlerts from "../components/FridgeWithAlerts";
 import AddAliment from "../components/AddAliment";
-import FriendGroups from "../components/FriendGroups";
-import FriendsList from "../components/FriendsList";
-import InviteFriends from "../components/InviteFriends";
-import SearchAllUsers from "../components/SearchAllUsers";
-import AddFriend from "../components/AddFriend";
+import ShareAvailableAlimente from "../components/ShareAvailableAlimente";
 import { useUserContext } from "../context/UserContext";
 
 const FridgePage = () => {
   const { user } = useUserContext();
   const [alimente, setAlimente] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [friendsRefreshKey, setFriendsRefreshKey] = useState(0);
 
   // Fetch alimente and alerts
   const fetchData = async () => {
@@ -68,17 +64,7 @@ const FridgePage = () => {
         alerts={alerts}
         onToggleDisponibil={handleToggleDisponibil}
       />
-      <FriendsList />
-      <FriendGroups
-        userId={user.id}
-        refreshKey={friendsRefreshKey} // Refresh key for FriendGroups
-      />
-      <InviteFriends userId={user.id} />
-      <SearchAllUsers />
-      <AddFriend
-        userId={user.id}
-        onAddComplete={() => setFriendsRefreshKey((prevKey) => prevKey + 1)} // Trigger refresh for FriendGroups
-      />
+      <ShareAvailableAlimente />
     </div>
   );
 };

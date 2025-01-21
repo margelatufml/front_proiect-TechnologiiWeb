@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 const NavBar = () => {
   return (
     <div className="navbar bg-base-100">
@@ -25,13 +27,24 @@ const NavBar = () => {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a href="#">Homepage</a>
+              <NavLink
+                to="/fridge"
+                className={({ isActive }) =>
+                  isActive ? "active-class-name" : "inactive-class-name"
+                }
+              >
+                Fridge
+              </NavLink>
             </li>
             <li>
-              <a href="#">Portfolio</a>
-            </li>
-            <li>
-              <a href="#">About</a>
+              <NavLink
+                to="/friends"
+                className={({ isActive }) =>
+                  isActive ? "active-class-name" : "inactive-class-name"
+                }
+              >
+                Friends
+              </NavLink>
             </li>
           </ul>
         </div>
@@ -39,7 +52,7 @@ const NavBar = () => {
 
       {/* Navbar Center */}
       <div className="navbar-center">
-        <a className="btn btn-ghost text-xl">daisyUI</a>
+        <a className="btn btn-ghost text-xl">ByteNinjas</a>
       </div>
 
       {/* Navbar End */}

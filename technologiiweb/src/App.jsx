@@ -1,10 +1,10 @@
-// src/App.js
+// src/App.jsx
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import MainPage from "./pages/MainPage";
 import FridgePage from "./pages/FridgePage";
-import RegisterPage from "./pages/RegisterPage"; // Updated path
+import FriendsPage from "./pages/FriendsPage"; // Ensure correct import
+import RegisterPage from "./pages/RegisterPage"; // Ensure correct import
 import { UserProvider } from "./context/UserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -13,18 +13,31 @@ function App() {
     <UserProvider>
       <Router>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          {/* Protected Routes */}
           <Route
-            path="/main"
+            path="/fridge"
             element={
               <ProtectedRoute>
-                <MainPage />
+                <FridgePage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/fridge"
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <FriendsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback Route */}
+          <Route
+            path="*"
             element={
               <ProtectedRoute>
                 <FridgePage />
