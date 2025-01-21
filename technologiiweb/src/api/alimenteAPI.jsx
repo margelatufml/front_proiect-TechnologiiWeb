@@ -83,6 +83,27 @@ const AlimentAPI = {
       throw error;
     }
   },
+  toggleDisponibil: async (id) => {
+    try {
+      const response = await axios.put(`${apiUrl}/${id}/toggle`);
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Error toggling disponibil:",
+        error.response?.data || error
+      );
+      throw error;
+    }
+  },
+  deleteAliment: async (id) => {
+    try {
+      const response = await axios.delete(`${apiUrl}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting aliment:", error.response?.data || error);
+      throw error;
+    }
+  },
 };
 
 export default AlimentAPI;

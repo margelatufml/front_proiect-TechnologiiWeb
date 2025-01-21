@@ -1,32 +1,79 @@
-import React, { useState } from "react";
-import PrietenAPI from "../api/prietenAPI";
+import React, { useState, useEffect } from "react";
+import UtilizatorAPI from "../api/utilizatorAPI";
+import PrietenAPI from "../api/PrietenAPI";
+
 
 const AddFriend = ({ userId }) => {
-  const [friendId, setFriendId] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
   const [tag, setTag] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const tags = [
+    "vegetarieni",
+    "carnivori",
+    "iubitori de zacusca",
+    "iubitori de legume",
+    "iubitori de toate categoriile",
+  ];
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const users = await UtilizatorAPI.getAllUsers();
+        const filteredUsers = users.filter(
+          (user) => user.id_utilizator !== userId
+        );
+        setAllUsers(filteredUsers);
+        setFilteredUsers(filteredUsers);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setErrorMessage("Failed to fetch users.");
+      }
+    };
+
+    fetchUsers();
+  }, [userId]);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredUsers(
+      query
+        ? allUsers.filter((user) => user.username.toLowerCase().includes(query))
+        : allUsers
+    );
+  };
+
   const handleAddFriend = async (e) => {
     e.preventDefault();
 
-    if (parseInt(friendId, 10) === userId) {
-      setErrorMessage("You cannot add yourself as a friend.");
-      setSuccessMessage("");
+    if (!selectedUser || !tag) {
+      setErrorMessage("Please select a friend and tag.");
       return;
     }
 
     try {
       const data = {
         id_utilizator: userId,
-        id_prieten_utilizator: friendId,
+        id_prieten_utilizator: selectedUser,
         eticheta_prieten: tag,
       };
       await PrietenAPI.addFriend(data);
+
+      // Emit a custom event to refresh FriendGroups
+      const event = new CustomEvent("friendAdded", { detail: selectedUser });
+      window.dispatchEvent(event);
+
       setSuccessMessage("Friend added successfully!");
       setErrorMessage("");
-      setFriendId("");
+      setSelectedUser("");
       setTag("");
+      setSearchQuery("");
+      setFilteredUsers(allUsers);
     } catch (error) {
       setErrorMessage(
         "Error adding friend. Friend relationship may already exist."
@@ -42,35 +89,54 @@ const AddFriend = ({ userId }) => {
       {errorMessage && <p className="text-error">{errorMessage}</p>}
       <form onSubmit={handleAddFriend} className="space-y-4">
         <div className="form-control">
-          <label className="label">
-            <span className="label-text">Friend's User ID:</span>
-          </label>
-          <input
-            type="number"
-            value={friendId}
-            onChange={(e) => setFriendId(e.target.value)}
-            placeholder="Enter friend's user ID"
-            className="input input-bordered w-full"
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text">Tag:</span>
-          </label>
+          <label className="label">Search Friend by Name:</label>
           <input
             type="text"
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Type a friend's name"
+            className="input input-bordered w-full"
+          />
+          {filteredUsers.length > 0 && (
+            <ul className="list-none mt-2 bg-base-100 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+              {filteredUsers.map((user) => (
+                <li
+                  key={user.id_utilizator}
+                  onClick={() => {
+                    setSelectedUser(user.id_utilizator);
+                    setSearchQuery(user.username);
+                    setFilteredUsers([]);
+                  }}
+                  className="p-2 cursor-pointer hover:bg-base-200"
+                >
+                  {user.username}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="form-control">
+          <label className="label">Tag:</label>
+          <select
             value={tag}
             onChange={(e) => setTag(e.target.value)}
-            placeholder="Enter a tag (e.g., Best Friend)"
-            className="input input-bordered w-full"
+            className="select select-bordered w-full"
             required
-          />
+          >
+            <option value="" disabled>
+              Select a tag
+            </option>
+            {tags.map((tagOption) => (
+              <option key={tagOption} value={tagOption}>
+                {tagOption}
+              </option>
+            ))}
+          </select>
         </div>
         <button
           type="submit"
           className="btn btn-primary w-full"
-          disabled={parseInt(friendId, 10) === userId}
+          disabled={!selectedUser || !tag}
         >
           Add Friend
         </button>

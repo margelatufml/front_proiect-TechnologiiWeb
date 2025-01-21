@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AlimentAPI from "../api/alimenteAPI";
-import PostToSocialMedia from "./PostToSocialMedia";
+import PostToSocialMedia from "./ShareAvailableAlimente";
 
 const AvailableProducts = () => {
   const [products, setProducts] = useState([]);

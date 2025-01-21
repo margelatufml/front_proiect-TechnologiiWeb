@@ -5,8 +5,17 @@ const AddAliment = ({ userId, onAdd }) => {
   const [categorie, setCategorie] = useState("");
   const [continut, setContinut] = useState("");
   const [dataExpirare, setDataExpirare] = useState("");
+  const [disponibil, setDisponibil] = useState(true); // Checkbox state
 
-  // Format date to DD-MM-YYYY
+  const categories = [
+    "Lactate",
+    "Legume",
+    "Fructe",
+    "Mancare",
+    "Muraturi",
+    "Dulciuri",
+  ];
+
   const formatDateToDDMMYYYY = (date) => {
     const [year, month, day] = date.split("-");
     return `${day}-${month}-${year}`;
@@ -15,21 +24,25 @@ const AddAliment = ({ userId, onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure all fields are properly formatted
     const newAliment = {
       id_utilizator: userId,
-      categorie: categorie.trim(), // Remove any extra spaces
-      continut: continut.trim(), // Remove any extra spaces
-      data_expirare: formatDateToDDMMYYYY(dataExpirare), // Format date
-      disponibil: true, // Explicitly ensure it’s a boolean
+      categorie: categorie.trim(),
+      continut: continut.trim(),
+      data_expirare: formatDateToDDMMYYYY(dataExpirare),
+      disponibil,
     };
 
     try {
-      console.log("Sending payload:", newAliment);
       const addedAliment = await AlimentAPI.createAliment(newAliment);
-      onAdd(addedAliment); // Update the list on the page
+      onAdd(addedAliment); // Notify parent to update alimente
+      setCategorie("");
+      setContinut("");
+      setDataExpirare("");
+      setDisponibil(true);
     } catch (error) {
-      console.error("Error adding aliment:", error.response?.data || error);
+      const errorMessage =
+        error.response?.data?.error || error.message || "An error occurred.";
+      alert(`Error adding aliment: ${errorMessage}`);
     }
   };
 
@@ -44,14 +57,21 @@ const AddAliment = ({ userId, onAdd }) => {
         <label className="label">
           <span className="label-text">Categorie:</span>
         </label>
-        <input
-          type="text"
+        <select
           value={categorie}
           onChange={(e) => setCategorie(e.target.value)}
-          placeholder="Enter category"
-          className="input input-bordered w-full"
+          className="select select-bordered w-full"
           required
-        />
+        >
+          <option value="" disabled>
+            Select a category
+          </option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="form-control">
@@ -79,6 +99,18 @@ const AddAliment = ({ userId, onAdd }) => {
           className="input input-bordered w-full"
           required
         />
+      </div>
+
+      <div className="form-control flex items-center">
+        <label className="label cursor-pointer">
+          <input
+            type="checkbox"
+            checked={disponibil}
+            onChange={(e) => setDisponibil(e.target.checked)}
+            className="checkbox checkbox-primary"
+          />
+          <span className="label-text ml-2">Disponibil</span>
+        </label>
       </div>
 
       <button type="submit" className="btn btn-primary w-full">
