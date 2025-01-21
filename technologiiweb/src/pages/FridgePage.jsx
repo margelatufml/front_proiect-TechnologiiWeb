@@ -1,78 +1,84 @@
 import React, { useState, useEffect } from "react";
-import FridgeList from "../components/FridgeList";
-import AddAliment from "../components/AddAliment";
-import CategoryFilter from "../components/CategoryFilter";
-import AlertsList from "../components/Alertsist";
 import AlimentAPI from "../api/alimenteAPI";
 import NavBar from "../components/Navbar";
+import FridgeWithAlerts from "../components/FridgeWithAlerts";
+import AddAliment from "../components/AddAliment";
 import FriendGroups from "../components/FriendGroups";
+import FriendsList from "../components/FriendsList";
 import InviteFriends from "../components/InviteFriends";
 import SearchAllUsers from "../components/SearchAllUsers";
 import AddFriend from "../components/AddFriend";
-import FoodItemsModal from "../components/FoodItemsModal";
+import { useUserContext } from "../context/UserContext";
 
-const FridgePage = ({ userId }) => {
+const FridgePage = () => {
+  const { user } = useUserContext();
   const [alimente, setAlimente] = useState([]);
-  const [filteredAlimente, setFilteredAlimente] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [alerts, setAlerts] = useState([]);
+  const [friendsRefreshKey, setFriendsRefreshKey] = useState(0);
 
-  useEffect(() => {
-    const fetchAlimente = async () => {
-      try {
-        const data = await AlimentAPI.getAlimenteByUser(userId);
-        setAlimente(data);
-        setFilteredAlimente(data);
-      } catch (error) {
-        console.error("Error fetching alimente:", error);
-      }
-    };
-
-    fetchAlimente();
-  }, [userId]);
-
-  const handleAddAliment = (newAliment) => {
-    setAlimente((prev) => [...prev, newAliment]);
-    setFilteredAlimente((prev) => [...prev, newAliment]);
-  };
-
-  const handleFilterCategory = async (category) => {
+  // Fetch alimente and alerts
+  const fetchData = async () => {
     try {
-      const data = await AlimentAPI.getAlimenteByCategory(userId, category);
-      setFilteredAlimente(data);
+      const alimenteData = await AlimentAPI.getAlimenteByUser(user.id);
+      setAlimente(alimenteData);
+
+      const alertsData = await AlimentAPI.getAlerts(user.id);
+      setAlerts(alertsData.map((alert) => alert.id_aliment));
     } catch (error) {
-      console.error("Error filtering alimente by category:", error);
+      console.error("Error fetching data:", error);
     }
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  useEffect(() => {
+    if (user) fetchData();
+  }, [user]);
+
+  const handleAddAliment = (newAliment) => {
+    // Add new aliment to the state and refetch alerts
+    setAlimente((prevAlimente) => [...prevAlimente, newAliment]);
+    fetchData();
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleToggleDisponibil = async (updatedAliment) => {
+    try {
+      // Update the aliment's disponibil status in the backend
+      const toggledAliment = await AlimentAPI.toggleDisponibil(
+        updatedAliment.id_aliment
+      );
+      // Update the alimente state with the new data
+      setAlimente((prevAlimente) =>
+        prevAlimente.map((aliment) =>
+          aliment.id_aliment === toggledAliment.id_aliment
+            ? toggledAliment
+            : aliment
+        )
+      );
+      fetchData(); // Refresh alerts and alimente
+    } catch (error) {
+      console.error("Error toggling disponibil:", error);
+    }
   };
 
   return (
     <div>
       <NavBar />
-      <AddAliment userId={userId} onAdd={handleAddAliment} />
-      <CategoryFilter onFilter={handleFilterCategory} />
-      <AlertsList userId={userId} />
-      <FridgeList alimente={filteredAlimente} />
-      <FriendGroups userId={userId} />
-      <InviteFriends userId={userId} />
+      <AddAliment userId={user.id} onAdd={handleAddAliment} />
+      <FridgeWithAlerts
+        alimente={alimente}
+        alerts={alerts}
+        onToggleDisponibil={handleToggleDisponibil}
+      />
+      <FriendsList />
+      <FriendGroups
+        userId={user.id}
+        refreshKey={friendsRefreshKey} // Refresh key for FriendGroups
+      />
+      <InviteFriends userId={user.id} />
       <SearchAllUsers />
-      <AddFriend userId={userId} />
-      {isModalOpen && (
-        <FoodItemsModal
-          userId={userId}
-          isOpen={isModalOpen}
-          onClose={closeModal}
-        />
-      )}{" "}
-      <button className="btn btn-primary" onClick={openModal}>
-        View All Food Items
-      </button>
+      <AddFriend
+        userId={user.id}
+        onAddComplete={() => setFriendsRefreshKey((prevKey) => prevKey + 1)} // Trigger refresh for FriendGroups
+      />
     </div>
   );
 };

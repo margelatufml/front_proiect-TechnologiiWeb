@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import AlimentAPI from "../api/alimenteAPI";
 
-const FoodItemsModal = ({ userId, isOpen, onClose }) => {
+const FoodItemsModal = ({ friendId, isOpen, onClose }) => {
   const [foodItems, setFoodItems] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!friendId) return;
+
     const fetchFoodItems = async () => {
       try {
-        const data = await AlimentAPI.getAllAlimente();
+        const data = await AlimentAPI.getAlimenteByUser(friendId); // Fetch food items for the specific friend
         setFoodItems(data);
       } catch (err) {
         setError("Error fetching food items. Please try again.");
@@ -17,18 +19,18 @@ const FoodItemsModal = ({ userId, isOpen, onClose }) => {
     };
 
     fetchFoodItems();
-  }, []);
+  }, [friendId]);
 
   const handleClaim = async (id) => {
     try {
-      await AlimentAPI.claimAliment(id, userId);
+      await AlimentAPI.claimAliment(id, friendId);
       setFoodItems((prevItems) =>
         prevItems.map((item) =>
           item.id_aliment === id
             ? {
                 ...item,
                 disponibil: item.disponibil - 1,
-                id_utilizator: userId,
+                id_utilizator: friendId,
               }
             : item
         )
@@ -44,7 +46,7 @@ const FoodItemsModal = ({ userId, isOpen, onClose }) => {
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-4xl">
-        <h2 className="text-2xl font-bold mb-4">Available Food Items</h2>
+        <h2 className="text-2xl font-bold mb-4">Food Items for Friend</h2>
         {error && <p className="text-error mb-4">{error}</p>}
         <div className="overflow-x-auto">
           <table className="table table-zebra w-full">
@@ -54,7 +56,6 @@ const FoodItemsModal = ({ userId, isOpen, onClose }) => {
                 <th>Category</th>
                 <th>Expires</th>
                 <th>Disponibil</th>
-                <th>Assigned Users</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -65,7 +66,6 @@ const FoodItemsModal = ({ userId, isOpen, onClose }) => {
                   <td>{item.categorie}</td>
                   <td>{new Date(item.data_expirare).toLocaleDateString()}</td>
                   <td>{item.disponibil}</td>
-                  <td>User ID: {item.id_utilizator}</td>
                   <td>
                     {item.disponibil > 0 ? (
                       <button

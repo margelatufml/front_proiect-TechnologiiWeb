@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import PrietenAPI from "../api/PrietenAPI";
+import FoodItemsModal from "./FoodItemsModal";
 
 const FriendGroups = ({ userId }) => {
   const [friends, setFriends] = useState([]);
-  const [newFriend, setNewFriend] = useState({
-    id_prieten_utilizator: "",
-    eticheta_prieten: "",
-  });
   const [error, setError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFriendId, setSelectedFriendId] = useState(null);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -21,47 +20,57 @@ const FriendGroups = ({ userId }) => {
     };
 
     fetchFriends();
+
+    // Listen for the custom event and refresh friends
+    const handleFriendAdded = () => {
+      fetchFriends();
+    };
+    window.addEventListener("friendAdded", handleFriendAdded);
+
+    return () => {
+      // Cleanup the event listener
+      window.removeEventListener("friendAdded", handleFriendAdded);
+    };
   }, [userId]);
 
-  const handleAddFriend = async (e) => {
-    e.preventDefault();
+  const openModal = (friendId) => {
+    setSelectedFriendId(friendId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedFriendId(null);
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteFriend = async (friendId) => {
     try {
-      const addedFriend = await PrietenAPI.addFriend({
-        id_utilizator: userId,
-        ...newFriend,
-      });
-      setFriends((prev) => [...prev, addedFriend]);
-      setNewFriend({ id_prieten_utilizator: "", eticheta_prieten: "" });
+      await PrietenAPI.deleteFriend(friendId);
+      setFriends((prevFriends) =>
+        prevFriends.filter((friend) => friend.id_prietenie !== friendId)
+      );
     } catch (err) {
-      console.error("Error adding friend:", err);
-      setError("Failed to add friend. Ensure all fields are correct.");
+      console.error("Error deleting friend:", err);
+      setError("Failed to delete friend.");
     }
   };
 
-  const handleUpdateFriend = async (id, label) => {
+  const handleUpdateTag = async (friendId, newTag) => {
     try {
       await PrietenAPI.updateFriendLabel(userId, {
-        id_prieten_utilizator: id,
-        eticheta_prieten: label,
+        id_prieten_utilizator: friendId,
+        eticheta_prieten: newTag,
       });
-      setFriends((prev) =>
-        prev.map((friend) =>
-          friend.id_prieten_utilizator === id
-            ? { ...friend, eticheta_prieten: label }
+      setFriends((prevFriends) =>
+        prevFriends.map((friend) =>
+          friend.id_prieten_utilizator === friendId
+            ? { ...friend, eticheta_prieten: newTag }
             : friend
         )
       );
     } catch (err) {
-      console.error("Error updating friend label:", err);
-    }
-  };
-
-  const handleDeleteFriend = async (id) => {
-    try {
-      await PrietenAPI.deleteFriend(id);
-      setFriends((prev) => prev.filter((friend) => friend.id_prietenie !== id));
-    } catch (err) {
-      console.error("Error deleting friend:", err);
+      console.error("Error updating tag:", err);
+      setError("Failed to update tag.");
     }
   };
 
@@ -69,38 +78,6 @@ const FriendGroups = ({ userId }) => {
     <div className="p-4 bg-base-200 rounded-lg shadow-lg">
       <h2 className="text-xl font-bold">Manage Friends</h2>
       {error && <p className="text-error">{error}</p>}
-      <form onSubmit={handleAddFriend} className="space-y-4 mt-4">
-        <div className="form-control">
-          <input
-            type="number"
-            placeholder="Friend's User ID"
-            value={newFriend.id_prieten_utilizator}
-            onChange={(e) =>
-              setNewFriend({
-                ...newFriend,
-                id_prieten_utilizator: e.target.value,
-              })
-            }
-            className="input input-bordered"
-            required
-          />
-        </div>
-        <div className="form-control">
-          <input
-            type="text"
-            placeholder="Tag (e.g., Vegetarian)"
-            value={newFriend.eticheta_prieten}
-            onChange={(e) =>
-              setNewFriend({ ...newFriend, eticheta_prieten: e.target.value })
-            }
-            className="input input-bordered"
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Add Friend
-        </button>
-      </form>
       <ul className="space-y-4 mt-4">
         {friends.map((friend) => (
           <li
@@ -109,20 +86,22 @@ const FriendGroups = ({ userId }) => {
           >
             <span>
               Friend ID: {friend.id_prieten_utilizator} - Tag:{" "}
-              {friend.eticheta_prieten}
-            </span>
-            <div className="space-x-2">
               <input
                 type="text"
                 value={friend.eticheta_prieten}
                 onChange={(e) =>
-                  handleUpdateFriend(
-                    friend.id_prieten_utilizator,
-                    e.target.value
-                  )
+                  handleUpdateTag(friend.id_prieten_utilizator, e.target.value)
                 }
                 className="input input-bordered w-48"
               />
+            </span>
+            <div className="space-x-2">
+              <button
+                onClick={() => openModal(friend.id_prieten_utilizator)}
+                className="btn btn-outline btn-primary"
+              >
+                View Food Items
+              </button>
               <button
                 onClick={() => handleDeleteFriend(friend.id_prietenie)}
                 className="btn btn-outline btn-error"
@@ -133,6 +112,13 @@ const FriendGroups = ({ userId }) => {
           </li>
         ))}
       </ul>
+      {isModalOpen && (
+        <FoodItemsModal
+          friendId={selectedFriendId}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };
