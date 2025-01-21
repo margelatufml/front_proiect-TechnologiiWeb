@@ -20,8 +20,6 @@ const FriendGroups = ({ userId }) => {
     };
 
     fetchFriends();
-
-    // Listen for the custom event and refresh friends
     const handleFriendAdded = () => {
       fetchFriends();
     };

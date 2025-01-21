@@ -35,7 +35,6 @@ const FridgeWithAlerts = ({ alimente = [], alerts = [], onUpdate }) => {
         )
       );
 
-      // Optionally notify parent to refresh the full list
       if (onUpdate) {
         onUpdate();
       }

@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import MainPage from "./pages/MainPage";
 import FridgePage from "./pages/FridgePage";
-import RegisterPage from "./components/RegisterPage"; // Updated path
+import RegisterPage from "./pages/RegisterPage"; // Updated path
 import { UserProvider } from "./context/UserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
