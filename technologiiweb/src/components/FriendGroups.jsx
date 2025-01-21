@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import PrietenAPI from "../api/PrietenAPI";
+import PrietenAPI from "../api/prietenAPI";
 
 const FriendGroups = ({ userId }) => {
   const [friends, setFriends] = useState([]);

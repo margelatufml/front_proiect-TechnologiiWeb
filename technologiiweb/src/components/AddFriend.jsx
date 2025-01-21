@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import PrietenAPI from "../api/PrietenAPI";
+import PrietenAPI from "../api/prietenAPI";
 
 const AddFriend = ({ userId }) => {
   const [friendId, setFriendId] = useState("");
