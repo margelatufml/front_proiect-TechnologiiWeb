@@ -1,4 +1,3 @@
-// src/pages/LoginPage.js
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
@@ -9,17 +8,25 @@ const LoginPage = () => {
   const [parola, setParola] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { setUser } = useUserContext(); // Access setUser from UserContext
+  const { setUser } = useUserContext();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       const response = await UtilizatorAPI.loginUser({ username, parola });
 
       if (response && response.message === "Login successful.") {
-        setUser(response.user); // Store user data in context
-        navigate("/fridge"); // Navigate to the main page
+        // Store the token and user data in localStorage
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("user", JSON.stringify(response.user));
+
+        // Update the user context
+        setUser(response.user);
+
+        // Redirect to the fridge page
+        navigate("/fridge");
       } else {
         setError("Invalid username or password.");
       }

@@ -71,7 +71,7 @@ const FriendGroups = ({ userId }) => {
   const handleUpdateTag = async (friendId, newTag) => {
     try {
       await PrietenAPI.updateFriendLabel(userId, {
-        id_utilizator: friendId,
+        id_prieten_utilizator: friendId,
         eticheta_prieten: newTag,
       });
       setFriends((prevFriends) =>
