@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import UtilizatorAPI from "../api/utilizatorAPI";
 import PrietenAPI from "../api/PrietenAPI";
 
+
 const AddFriend = ({ userId }) => {
   const [allUsers, setAllUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
