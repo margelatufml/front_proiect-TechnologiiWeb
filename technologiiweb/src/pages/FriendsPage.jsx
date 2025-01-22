@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import NavBar from "../components/Navbar";
 import FriendGroups from "../components/FriendGroups";
-import InviteFriends from "../components/InviteFriends";
 import SearchAllUsers from "../components/SearchAllUsers";
 import AddFriend from "../components/AddFriend";
 import { useUserContext } from "../context/UserContext";
@@ -15,18 +14,45 @@ const FriendsPage = () => {
     setFriendsRefreshKey((prevKey) => prevKey + 1);
   };
 
+  // ----------------------------------
+  // 1) If 'user' is null, show a fallback (e.g. loading)
+  // ----------------------------------
+  if (!user) {
+    return (
+      <div>
+        <NavBar />
+        <p>Loading user data...</p>
+      </div>
+    );
+  }
+
+  // ----------------------------------
+  // 2) If user exists but no ID, handle gracefully
+  //    (Depending on your backend, this might be user.id or user.id_utilizator)
+  // ----------------------------------
+  if (!user.id_utilizator) {
+    return (
+      <div>
+        <NavBar />
+        <p>No valid user ID found. Please re-login.</p>
+      </div>
+    );
+  }
+
+  // ----------------------------------
+  // 3) Main render after passing checks
+  // ----------------------------------
   return (
     <div>
       <NavBar />
       <FriendGroups
-        userId={user.id}
-        refreshKey={friendsRefreshKey} // Refresh key for FriendGroups
+        userId={user.id_utilizator}
+        refreshKey={friendsRefreshKey} // Pass refresh key for FriendGroups
       />
-      <InviteFriends userId={user.id} />
       <SearchAllUsers />
       <AddFriend
-        userId={user.id}
-        onAddComplete={handleAddComplete} // Trigger refresh for FriendGroups
+        userId={user.id_utilizator}
+        onAddComplete={handleAddComplete}
       />
     </div>
   );
