@@ -32,7 +32,7 @@ const FoodItemsModal = ({ friendId, isOpen, onClose }) => {
             ? {
                 ...item,
                 disponibil: item.disponibil - 1,
-                id_utilizator: friendId,
+                id_utilizator: userId,
               }
             : item
         )
