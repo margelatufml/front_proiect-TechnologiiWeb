@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import UtilizatorAPI from "../api/utilizatorAPI";
-import PrietenAPI from "../api/PrietenAPI";
+import PrietenAPI from "../api/prietenAPI";
 
 
 const AddFriend = ({ userId }) => {

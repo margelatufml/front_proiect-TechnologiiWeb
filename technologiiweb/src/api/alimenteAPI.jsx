@@ -113,9 +113,10 @@ const AlimentAPI = {
   claimAliment: async (id, userId) => {
     try {
       const token = getToken();
+      console.log(`API call to claim aliment with id: ${id} for user: ${userId}`);
       const response = await axios.put(
         `${apiUrl}/${id}`,
-        { id_utilizator: userId },
+        { id_utilizator: userId, disponibil: false },
         {
           headers: {
             Authorization: `Bearer ${token}`,

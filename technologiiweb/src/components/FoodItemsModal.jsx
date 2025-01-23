@@ -23,14 +23,17 @@ const FoodItemsModal = ({ friendId, isOpen, onClose }) => {
 
   const handleClaim = async (id) => {
     try {
-      await AlimentAPI.claimAliment(id, friendId);
+      const user = JSON.parse(localStorage.getItem("user"));
+      console.log(`Claiming aliment with id: ${id} for user: ${user.id_utilizator}`);
+      const userId = user.id_utilizator;
+      await AlimentAPI.claimAliment(id, userId);
       setFoodItems((prevItems) =>
         prevItems.map((item) =>
           item.id_aliment === id
             ? {
                 ...item,
                 disponibil: item.disponibil - 1,
-                id_utilizator: friendId,
+                id_utilizator: userId,
               }
             : item
         )
