@@ -1,6 +1,6 @@
 // src/components/FriendGroups.jsx
 import React, { useState, useEffect } from "react";
-import PrietenAPI from "../api/PrietenAPI";
+import PrietenAPI from "../api/prietenAPI";
 import UtilizatorAPI from "../api/utilizatorAPI";
 import FoodItemsModal from "./FoodItemsModal";
 

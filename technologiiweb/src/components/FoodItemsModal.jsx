@@ -23,7 +23,9 @@ const FoodItemsModal = ({ friendId, isOpen, onClose }) => {
 
   const handleClaim = async (id) => {
     try {
-      await AlimentAPI.claimAliment(id, friendId);
+      const user = JSON.parse(localStorage.getItem("user"));
+      const userId = user.id_utilizator;
+      await AlimentAPI.claimAliment(id, userId);
       setFoodItems((prevItems) =>
         prevItems.map((item) =>
           item.id_aliment === id

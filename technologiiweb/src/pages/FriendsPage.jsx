@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import NavBar from "../components/Navbar";
 import FriendGroups from "../components/FriendGroups";
-import SearchAllUsers from "../components/SearchAllUsers";
 import AddFriend from "../components/AddFriend";
 import { useUserContext } from "../context/UserContext";
 
@@ -49,7 +48,7 @@ const FriendsPage = () => {
         userId={user.id_utilizator}
         refreshKey={friendsRefreshKey} // Pass refresh key for FriendGroups
       />
-      <SearchAllUsers />
+
       <AddFriend
         userId={user.id_utilizator}
         onAddComplete={handleAddComplete}
